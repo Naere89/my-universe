@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#08091a">
+    <meta name="description" content="{{ c.SITE_TITLE }}">
+    <title>{{ c.SITE_TITLE }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=av) }}">
+</head>
+<body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="nebula nebula-one" aria-hidden="true"></div>
+    <div class="nebula nebula-two" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <a class="brand" href="#home" aria-label="На главную"><span class="brand-star">✦</span> {{ c.BRAND }}</a>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" title="Включить или выключить звуковые эффекты">
+            <span id="soundIcon">♫</span><span class="sound-label">Звук выключен</span>
+        </button>
+    </header>
+
+    <main>
+        <section class="screen hero" id="home">
+            <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+            <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+            <div class="hero-content">
+                <p class="eyebrow"><span class="tiny-sparkle">✧</span> {{ c.HERO_EYEBROW }}</p>
+                <h1>{{ c.HERO_TITLE_LINE1 }}<br>{{ c.HERO_TITLE_LINE2 }} <span class="gradient-text">{{ c.HERO_TITLE_ACCENT }}</span></h1>
+                <p class="hero-copy">{{ c.HERO_COPY }}</p>
+                <button class="primary-button" id="beginJourney" type="button">{{ c.HERO_BUTTON }} <span aria-hidden="true">↗</span></button>
+                <p class="scroll-hint">{{ c.HERO_HINT }} <span>↓</span></p>
+            </div>
+            <div class="floating-heart" aria-hidden="true">♥</div>
+            <div class="planet planet-small" aria-hidden="true"></div>
+        </section>
+
+        <section class="screen letter-section" id="letter">
+            <div class="section-heading">
+                <p class="eyebrow">{{ c.LETTER_EYEBROW }}</p>
+                <h2>{{ c.LETTER_HEADING }} <span class="gradient-text">{{ c.LETTER_HEADING_ACCENT }}</span></h2>
+                <p>{{ c.LETTER_SUB }}</p>
+            </div>
+
+            <button class="envelope-button" id="openLetter" type="button" aria-label="Открыть письмо">
+                <span class="envelope-glow"></span>
+                <span class="envelope">
+                    <span class="envelope-back"></span>
+                    <span class="letter-paper"><span class="paper-heart">♥</span><span class="paper-lines"></span></span>
+                    <span class="envelope-flap"></span>
+                    <span class="envelope-front"></span>
+                    <span class="envelope-seal">♥</span>
+                </span>
+                <span class="envelope-caption">{{ c.LETTER_CAPTION }}</span>
+            </button>
+
+            <article class="letter-card hidden" id="letterCard" aria-live="polite">
+                <div class="letter-card-top"><span>✦</span><span>{{ c.LETTER_TOP }}</span><span>✦</span></div>
+                <div class="big-heart" aria-hidden="true">♥</div>
+                <h3>{{ c.LETTER_GREETING }}</h3>
+                <p id="letterText">{{ c.LETTER_TEXT }}</p>
+                <p class="letter-signature">{{ c.LETTER_SIGNATURE }}</p>
+                <button class="text-button" id="closeLetter" type="button">{{ c.LETTER_CLOSE }} ↑</button>
+            </article>
+        </section>
+
+        <section class="screen galaxy-section" id="galaxy">
+            <div class="section-heading">
+                <p class="eyebrow">{{ c.GALAXY_EYEBROW }}</p>
+                <h2>{{ c.GALAXY_HEADING }} <span class="gradient-text">{{ c.GALAXY_HEADING_ACCENT }}</span></h2>
+                <p>{{ c.GALAXY_SUB }}</p>
+            </div>
+
+            <div class="galaxy-map" id="galaxyMap">
+                <div class="galaxy-ring ring-a" aria-hidden="true"></div>
+                <div class="galaxy-ring ring-b" aria-hidden="true"></div>
+                <div class="galaxy-core" aria-hidden="true">♥</div>
+                {% set positions = ['star-a', 'star-b', 'star-c', 'star-d'] %}
+                {% for star in c.GALAXY_STARS %}
+                <button class="memory-star {{ positions[loop.index0 % 4] }}" type="button" data-title="{{ star.title }}" data-message="{{ star.message }}" aria-label="Открыть послание {{ loop.index }}"><span>{{ '✦' if loop.index0 % 2 == 0 else '✧' }}</span><small>{{ star.label }}</small></button>
+                {% endfor %}
+            </div>
+
+            <div class="memory-popup hidden" id="memoryPopup" role="dialog" aria-modal="true" aria-labelledby="memoryTitle">
+                <button class="popup-close" id="closeMemory" type="button" aria-label="Закрыть">×</button>
+                <div class="popup-star">✦</div>
+                <p class="eyebrow">{{ c.POPUP_EYEBROW }}</p>
+                <h3 id="memoryTitle"></h3>
+                <p id="memoryMessage"></p>
+                <button class="secondary-button" id="memoryOkay" type="button">{{ c.POPUP_BUTTON }}</button>
+            </div>
+            <p class="tiny-note">{{ c.GALAXY_HINT }}</p>
+        </section>
+
+        <section class="screen game-section" id="game">
+            <div class="section-heading">
+                <p class="eyebrow">{{ c.GAME_EYEBROW }}</p>
+                <h2>{{ c.GAME_HEADING }} <span class="gradient-text">{{ c.GAME_HEADING_ACCENT }}</span></h2>
+                <p>{{ c.GAME_SUB.format(target=c.GAME_TARGET) }}</p>
+            </div>
+
+            <div class="game-panel">
+                <div class="game-stats">
+                    <span>{{ c.GAME_STATS_LABEL }}: <strong id="score">0</strong> / {{ c.GAME_TARGET }}</span>
+                    <span class="game-timer">{{ c.GAME_TIMER_LABEL }}: <strong id="timeLeft">{{ c.GAME_DURATION }}</strong> сек.</span>
+                    <span>{{ c.GAME_PLAYS_LABEL }}: <strong id="playsCount">0</strong> {{ c.GAME_PLAYS_UNIT }}</span>
+                </div>
+                <div class="game-field" id="gameField" aria-label="Игровое поле. Нажимай на появляющиеся звёзды.">
+                    <div class="game-intro" id="gameIntro">
+                        <span class="game-big-star">✦</span>
+                        <p>{{ c.GAME_INTRO_TEXT }}</p>
+                        <button class="primary-button" id="startGame" type="button">{{ c.GAME_START_BUTTON }}</button>
+                    </div>
+                    <div class="game-message hidden" id="gameMessage" aria-live="polite"></div>
+                </div>
+                <p class="game-instruction">{{ c.GAME_INSTRUCTION }}</p>
+                <button class="text-button hidden" id="restartGame" type="button">{{ c.GAME_RESTART_BUTTON }}</button>
+            </div>
+
+            <div class="reward hidden" id="reward">
+                <div class="reward-heart">♥</div>
+                <p class="eyebrow">{{ c.REWARD_EYEBROW }}</p>
+                <h3>{{ c.REWARD_HEADING }}</h3>
+                <p id="rewardMessage"></p>
+                <button class="primary-button" id="finalButton" type="button">{{ c.GAME_FINAL_BUTTON }}</button>
+            </div>
+        </section>
+
+        <section class="screen finale-section hidden" id="finale">
+            <div class="finale-heart" aria-hidden="true"><span>♥</span></div>
+            <p class="eyebrow">{{ c.FINALE_EYEBROW }}</p>
+            <h2>{{ c.FINALE_HEADING }}<br><span class="gradient-text">{{ c.FINALE_HEADING_ACCENT }}</span></h2>
+            <p class="finale-message">{{ c.FINALE_MESSAGE }}</p>
+            <p class="finale-signature">{{ c.FINALE_SIGNATURE }}</p>
+            <button class="text-button" id="backToStart" type="button">{{ c.FINALE_BACK }}</button>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>{{ c.FOOTER_TEXT }}</span>
+        <span aria-hidden="true">✦ ♥ ✦</span>
+    </footer>
+
+    <script>window.GAME_CONFIG = {{ game_config | tojson }};</script>
+    <script src="{{ url_for('static', filename='js/script.js', v=av) }}"></script>
+</body>
+</html>
