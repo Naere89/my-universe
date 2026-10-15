@@ -39,7 +39,7 @@
             const opacity = 0.28 + (Math.sin(star.phase) + 1) * 0.34;
             ctx.beginPath();
             ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(239, 230, 255, ${opacity})`;
+            ctx.fillStyle = `rgba(255, 159, 28, ${opacity})`;
             ctx.fill();
         }
         animationFrame = requestAnimationFrame(animateStars);
@@ -75,7 +75,7 @@
         envelopeButton.setAttribute("aria-expanded", "false");
     });
 
-    // -------------------- Звёзды с посланиями --------------------
+    // -------------------- Призраки с посланиями --------------------
     const popup = document.getElementById("memoryPopup");
     const popupTitle = document.getElementById("memoryTitle");
     const popupMessage = document.getElementById("memoryMessage");
@@ -83,7 +83,7 @@
 
     document.querySelectorAll(".memory-star").forEach((button) => {
         button.addEventListener("click", () => {
-            popupTitle.textContent = button.dataset.title || "Особенная звезда";
+            popupTitle.textContent = button.dataset.title || "Особый призрак";
             popupMessage.textContent = button.dataset.message || "Небольшое послание для тебя.";
             popup.classList.remove("hidden");
             playTone(740, 0.08);
@@ -130,21 +130,21 @@
     soundToggle.addEventListener("click", () => {
         soundEnabled = !soundEnabled;
         soundToggle.setAttribute("aria-pressed", String(soundEnabled));
-        soundIcon.textContent = soundEnabled ? "♫" : "♪";
+        soundIcon.textContent = soundEnabled ? "🎵" : "♪";
         soundLabel.textContent = soundEnabled ? "Звук включён" : "Звук выключен";
         if (soundEnabled) playTone(880, 0.12);
     });
 
-    // -------------------- Мини-игра «Поймай звёзды» --------------------
+    // -------------------- Мини-игра «Поймай тыкву» --------------------
     // Настройки приходят из content.py (см. GAME_TARGET, GAME_DURATION и т.д.).
     const gameConfig = Object.assign({
         target: 15,
         duration: 45,
         winMessages: [],
-        winHeadline: "Все звёзды собраны! ✨",
+        winHeadline: "Все тыквы собраны! 🎃",
         winSub: "",
-        loseHeadline: "Почти получилось ✧",
-        loseSub: "Ничего страшного! В следующей попытке обязательно получится — ты большая молодец 💛"
+        loseHeadline: "Почти получилось 👻",
+        loseSub: "Ничего страшного! В следующей попытке обязательно получится — ты большая молодец 🖤"
     }, window.GAME_CONFIG || {});
 
     const gameField = document.getElementById("gameField");
@@ -165,8 +165,8 @@
     const winMessages = Array.isArray(gameConfig.winMessages) ? gameConfig.winMessages : [];
 
     // Счётчики хранятся в браузере, поэтому сохраняются между перезагрузками.
-    const STORAGE_PLAYS = "myUniversePlays";
-    const STORAGE_WINS = "myUniverseWins";
+    const STORAGE_PLAYS = "halloweenPlays";
+    const STORAGE_WINS = "halloweenWins";
 
     function readCounter(key) {
         const value = parseInt(window.localStorage.getItem(key) || "0", 10);
@@ -218,7 +218,7 @@
     function sparkleBurst(x, y) {
         const burst = document.createElement("span");
         burst.className = "collect-burst";
-        burst.textContent = "✧";
+        burst.textContent = "🎃";
         burst.style.left = `${x}px`;
         burst.style.top = `${y}px`;
         gameField.appendChild(burst);
@@ -257,8 +257,8 @@
         const star = document.createElement("button");
         star.type = "button";
         star.className = "game-star";
-        star.textContent = Math.random() > 0.18 ? "✦" : "♥";
-        star.setAttribute("aria-label", "Собрать звёздочку");
+        star.textContent = Math.random() > 0.18 ? "🎃" : "👻";
+        star.setAttribute("aria-label", "Собрать тыкву");
         const size = 48;
         const maxX = Math.max(0, gameField.clientWidth - size);
         const maxY = Math.max(0, gameField.clientHeight - size);
