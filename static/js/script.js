@@ -135,16 +135,15 @@
         if (soundEnabled) playTone(880, 0.12);
     });
 
-    // -------------------- Мини-игра «Поймай тыкву» --------------------
-    // Настройки приходят из content.py (см. GAME_TARGET, GAME_DURATION и т.д.).
+    // -------------------- Мини-игра «Охота за приведениями и мышками» --------------------
+    // Настройки приходят из content.py (см. GAME_DURATION, GAME_WIN_HEADLINE и т.д.).
     const gameConfig = Object.assign({
-        target: 15,
-        duration: 45,
+        duration: 30,
         winMessages: [],
-        winHeadline: "Все тыквы собраны! 🎃",
-        winSub: "",
-        loseHeadline: "Почти получилось 👻",
-        loseSub: "Ничего страшного! В следующей попытке обязательно получится — ты большая молодец 🖤"
+        winHeadline: "Охота окончена! 🎃",
+        winSub: "Ты поймал {count} существ.",
+        loseHeadline: "Время вышло 👻",
+        loseSub: "Поймано: {count}. Попробуй ещё раз!"
     }, window.GAME_CONFIG || {});
 
     const gameField = document.getElementById("gameField");
@@ -160,13 +159,18 @@
     const finalButton = document.getElementById("finalButton");
     const finale = document.getElementById("finale");
 
-    const targetScore = Number(gameConfig.target) || 15;
-    const gameDuration = Number(gameConfig.duration) || 45;
+    const gameDuration = Number(gameConfig.duration) || 30;
     const winMessages = Array.isArray(gameConfig.winMessages) ? gameConfig.winMessages : [];
 
+    // Типы существ: привидение (1 очко) и мышка (2 очка, быстрее)
+    const CREATURE_TYPES = [
+        { emoji: "👻", points: 1, speed: 2.6, size: 44 },
+        { emoji: "🦇", points: 2, speed: 3.4, size: 38 }
+    ];
+
     // Счётчики хранятся в браузере, поэтому сохраняются между перезагрузками.
-    const STORAGE_PLAYS = "halloweenPlays";
-    const STORAGE_WINS = "halloweenWins";
+    const STORAGE_PLAYS = "halloweenHuntPlays";
+    const STORAGE_WINS = "halloweenHuntWins";
 
     function readCounter(key) {
         const value = parseInt(window.localStorage.getItem(key) || "0", 10);
@@ -194,8 +198,8 @@
         spawnTimeout = null;
     }
 
-    function removeGameStars() {
-        gameField.querySelectorAll(".game-star").forEach((star) => star.remove());
+    function removeCreatures() {
+        gameField.querySelectorAll(".game-creature").forEach((c) => c.remove());
     }
 
     function updateGameStats() {
@@ -225,71 +229,89 @@
         setTimeout(() => burst.remove(), 520);
     }
 
-    function finishGame(won) {
+    function spawnCreature() {
+        if (!gameRunning) return;
+
+        const corners = ["tl", "tr", "bl", "br"];
+        const corner = corners[Math.floor(Math.random() * corners.length)];
+        const type = CREATURE_TYPES[Math.floor(Math.random() * CREATURE_TYPES.length)];
+
+        const creature = document.createElement("button");
+        creature.type = "button";
+        creature.className = "game-creature";
+        creature.textContent = type.emoji;
+        creature.dataset.points = type.points;
+
+        const size = type.size;
+        const fw = gameField.clientWidth || 600;
+        const fh = gameField.clientHeight || 300;
+
+        let x, y, tx, ty;
+        if (corner === "tl") { x = 0; y = 0; tx = fw - size; ty = fh - size; }
+        else if (corner === "tr") { x = fw - size; y = 0; tx = 0; ty = fh - size; }
+        else if (corner === "bl") { x = 0; y = fh - size; tx = fw - size; ty = 0; }
+        else { x = fw - size; y = fh - size; tx = 0; ty = 0; }
+
+        creature.style.left = `${x}px`;
+        creature.style.top = `${y}px`;
+        creature.style.width = `${size}px`;
+        creature.style.height = `${size}px`;
+        creature.style.fontSize = `${size * 0.6}px`;
+        creature.style.transition = `left ${type.speed}s linear, top ${type.speed}s linear`;
+
+        gameField.appendChild(creature);
+
+        // Небольшая задержка, чтобы браузер применил transition после вставки в DOM.
+        requestAnimationFrame(() => {
+            creature.style.left = `${tx}px`;
+            creature.style.top = `${ty}px`;
+        });
+
+        creature.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (!gameRunning || !creature.isConnected) return;
+            score += Number(creature.dataset.points);
+            updateGameStats();
+            playTone(600 + score * 12, 0.05);
+            sparkleBurst(x + size / 2 - 8, y + size / 2 - 12);
+            creature.remove();
+        });
+
+        // Существо исчезает само, если его не поймали.
+        setTimeout(() => {
+            if (creature.isConnected) creature.remove();
+        }, type.speed * 1000 + 150);
+
+        if (gameRunning) {
+            spawnTimeout = setTimeout(spawnCreature, 750);
+        }
+    }
+
+    function finishGame() {
         gameRunning = false;
         clearGameTimers();
-        removeGameStars();
+        removeCreatures();
         restartGame.classList.remove("hidden");
 
         plays += 1;
         window.localStorage.setItem(STORAGE_PLAYS, String(plays));
         refreshPlays();
 
-        if (won) {
-            wins += 1;
-            window.localStorage.setItem(STORAGE_WINS, String(wins));
-            setGameMessage(gameConfig.winHeadline, gameConfig.winSub);
-            if (rewardMessage && winMessages.length) {
-                const index = (wins - 1) % winMessages.length;
-                rewardMessage.textContent = winMessages[index];
-            }
-            reward.classList.remove("hidden");
-            playTone(880, 0.18);
-            setTimeout(() => reward.scrollIntoView({ behavior: "smooth", block: "center" }), 250);
-        } else {
-            setGameMessage(gameConfig.loseHeadline, gameConfig.loseSub);
-            reward.classList.add("hidden");
+        const sub = gameConfig.winSub.replace("{count}", score);
+        setGameMessage(gameConfig.winHeadline, sub);
+
+        if (rewardMessage && winMessages.length) {
+            const index = (plays - 1) % winMessages.length;
+            rewardMessage.textContent = winMessages[index];
         }
-    }
-
-    function spawnStar() {
-        if (!gameRunning) return;
-        const star = document.createElement("button");
-        star.type = "button";
-        star.className = "game-star";
-        star.textContent = Math.random() > 0.18 ? "🎃" : "👻";
-        star.setAttribute("aria-label", "Собрать тыкву");
-        const size = 48;
-        const maxX = Math.max(0, gameField.clientWidth - size);
-        const maxY = Math.max(0, gameField.clientHeight - size);
-        const x = Math.random() * maxX;
-        const y = Math.random() * maxY;
-        star.style.left = `${x}px`;
-        star.style.top = `${y}px`;
-        star.addEventListener("click", () => {
-            if (!gameRunning || !star.isConnected) return;
-            score += 1;
-            updateGameStats();
-            sparkleBurst(x + size / 2 - 8, y + size / 2 - 12);
-            star.remove();
-            playTone(600 + score * 20, 0.055);
-            if (score >= targetScore) {
-                finishGame(true);
-                return;
-            }
-            spawnTimeout = setTimeout(spawnStar, 220);
-        }, { once: true });
-        gameField.appendChild(star);
-
-        // A star disappears after a short while if it isn't caught.
-        setTimeout(() => {
-            if (star.isConnected) star.remove();
-        }, 1900);
+        reward.classList.remove("hidden");
+        playTone(880, 0.18);
+        setTimeout(() => reward.scrollIntoView({ behavior: "smooth", block: "center" }), 250);
     }
 
     function startNewGame() {
         clearGameTimers();
-        removeGameStars();
+        removeCreatures();
         score = 0;
         timeLeft = gameDuration;
         gameRunning = true;
@@ -298,12 +320,12 @@
         gameIntro.classList.add("hidden");
         gameMessage.classList.add("hidden");
         updateGameStats();
-        spawnStar();
+        spawnCreature();
 
         countdownInterval = setInterval(() => {
             timeLeft -= 1;
             updateGameStats();
-            if (timeLeft <= 0) finishGame(score >= targetScore);
+            if (timeLeft <= 0) finishGame();
         }, 1000);
     }
 

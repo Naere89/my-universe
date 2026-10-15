@@ -96,18 +96,18 @@
             <div class="section-heading">
                 <p class="eyebrow">{{ c.GAME_EYEBROW }}</p>
                 <h2>{{ c.GAME_HEADING }} <span class="gradient-text">{{ c.GAME_HEADING_ACCENT }}</span></h2>
-                <p>{{ c.GAME_SUB.format(target=c.GAME_TARGET) }}</p>
+                <p>{{ c.GAME_SUB }}</p>
             </div>
 
             <div class="game-panel">
                 <div class="game-stats">
-                    <span>{{ c.GAME_STATS_LABEL }}: <strong id="score">0</strong> / {{ c.GAME_TARGET }}</span>
+                    <span>{{ c.GAME_STATS_LABEL }}: <strong id="score">0</strong></span>
                     <span class="game-timer">{{ c.GAME_TIMER_LABEL }}: <strong id="timeLeft">{{ c.GAME_DURATION }}</strong> сек.</span>
                     <span>{{ c.GAME_PLAYS_LABEL }}: <strong id="playsCount">0</strong> {{ c.GAME_PLAYS_UNIT }}</span>
                 </div>
-                <div class="game-field" id="gameField" aria-label="Игровое поле. Нажимай на появляющиеся тыквы.">
+                <div class="game-field" id="gameField" aria-label="Игровое поле. Лови приведений и мышек.">
                     <div class="game-intro" id="gameIntro">
-                        <span class="game-big-pumpkin">🎃</span>
+                        <span class="game-big-creature">👻</span>
                         <p>{{ c.GAME_INTRO_TEXT }}</p>
                         <button class="primary-button" id="startGame" type="button">{{ c.GAME_START_BUTTON }}</button>
                     </div>

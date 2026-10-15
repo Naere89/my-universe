@@ -26,7 +26,6 @@ def asset_version():
 @app.route("/")
 def home():
     game_config = {
-        "target": content.GAME_TARGET,
         "duration": content.GAME_DURATION,
         "winMessages": content.GAME_WIN_MESSAGES,
         "winHeadline": content.GAME_WIN_HEADLINE,
