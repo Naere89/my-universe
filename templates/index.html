@@ -64,32 +64,26 @@
             </article>
         </section>
 
-        <section class="screen galaxy-section" id="galaxy">
+        <section class="screen chest-section" id="chest">
             <div class="section-heading">
-                <p class="eyebrow">{{ c.GALAXY_EYEBROW }}</p>
-                <h2>{{ c.GALAXY_HEADING }} <span class="gradient-text">{{ c.GALAXY_HEADING_ACCENT }}</span></h2>
-                <p>{{ c.GALAXY_SUB }}</p>
+                <p class="eyebrow">{{ c.CHEST_EYEBROW }}</p>
+                <h2>{{ c.CHEST_HEADING }} <span class="gradient-text">{{ c.CHEST_HEADING_ACCENT }}</span></h2>
+                <p>{{ c.CHEST_SUB }}</p>
             </div>
 
-            <div class="galaxy-map" id="galaxyMap">
-                <div class="galaxy-ring ring-a" aria-hidden="true"></div>
-                <div class="galaxy-ring ring-b" aria-hidden="true"></div>
-                <div class="galaxy-core" aria-hidden="true">🎃</div>
-                {% set positions = ['star-a', 'star-b', 'star-c', 'star-d'] %}
-                {% for star in c.GALAXY_STARS %}
-                <button class="memory-star {{ positions[loop.index0 % 4] }}" type="button" data-title="{{ star.title }}" data-message="{{ star.message }}" aria-label="Открыть послание {{ loop.index }}"><span>{{ '🎃' if loop.index0 % 2 == 0 else '👻' }}</span><small>{{ star.label }}</small></button>
-                {% endfor %}
+            <div class="chest-map" id="chestMap">
+                <div class="chest-pumpkin" id="chestPumpkin" type="button" role="button" tabindex="0" aria-label="Открыть сундук-тыкву">
+                    <div class="chest-lid" id="chestLid">🎃</div>
+                    <div class="chest-body">🎃</div>
+                </div>
+                <div class="chest-message hidden" id="chestMessage">
+                    <button class="popup-close" id="chestClose" type="button" aria-label="Закрыть">×</button>
+                    <p class="eyebrow">{{ c.POPUP_EYEBROW }}</p>
+                    <h3 id="chestTitle"></h3>
+                    <p id="chestText"></p>
+                </div>
             </div>
-
-            <div class="memory-popup hidden" id="memoryPopup" role="dialog" aria-modal="true" aria-labelledby="memoryTitle">
-                <button class="popup-close" id="closeMemory" type="button" aria-label="Закрыть">×</button>
-                <div class="popup-star">🎃</div>
-                <p class="eyebrow">{{ c.POPUP_EYEBROW }}</p>
-                <h3 id="memoryTitle"></h3>
-                <p id="memoryMessage"></p>
-                <button class="secondary-button" id="memoryOkay" type="button">{{ c.POPUP_BUTTON }}</button>
-            </div>
-            <p class="tiny-note">{{ c.GALAXY_HINT }}</p>
+            <p class="tiny-note">{{ c.CHEST_HINT }}</p>
         </section>
 
         <section class="screen game-section" id="game">
@@ -142,6 +136,7 @@
     </footer>
 
     <script>window.GAME_CONFIG = {{ game_config | tojson }};</script>
+    <script>window.CHEST_MESSAGES = {{ c.CHEST_MESSAGES | tojson }};</script>
     <script src="{{ url_for('static', filename='js/script.js', v=av) }}"></script>
 </body>
 </html>

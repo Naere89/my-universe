@@ -135,6 +135,45 @@
         if (soundEnabled) playTone(880, 0.12);
     });
 
+    // -------------------- Тайная тыква-сундук --------------------
+    const chestPumpkin = document.getElementById("chestPumpkin");
+    const chestLid = document.getElementById("chestLid");
+    const chestMessage = document.getElementById("chestMessage");
+    const chestClose = document.getElementById("chestClose");
+    const chestTitle = document.getElementById("chestTitle");
+    const chestText = document.getElementById("chestText");
+
+    let chestIndex = 0;
+    const chestMessages = window.CHEST_MESSAGES || [];
+
+    function openChest() {
+        if (!chestPumpkin || chestMessage.classList.contains("visible")) return;
+        chestLid.classList.add("opened");
+        chestPumpkin.style.pointerEvents = "none";
+        setTimeout(() => {
+            chestTitle.textContent = "Послание из бездны";
+            chestText.textContent = chestMessages[chestIndex] || "Тайна осталась в тыкве.";
+            chestIndex = (chestIndex + 1) % chestMessages.length;
+            chestMessage.classList.remove("hidden");
+            requestAnimationFrame(() => chestMessage.classList.add("visible"));
+            playTone(740, 0.1);
+        }, 450);
+    }
+
+    function closeChest() {
+        if (!chestMessage) return;
+        chestMessage.classList.remove("visible");
+        chestLid.classList.remove("opened");
+        if (chestPumpkin) chestPumpkin.style.pointerEvents = "auto";
+        setTimeout(() => chestMessage.classList.add("hidden"), 350);
+    }
+
+    if (chestPumpkin) {
+        chestPumpkin.addEventListener("click", openChest);
+        chestPumpkin.addEventListener("keydown", (e) => { if (e.key === "Enter") openChest(); });
+    }
+    if (chestClose) chestClose.addEventListener("click", closeChest);
+
     // -------------------- Мини-игра «Охота за приведениями и мышками» --------------------
     // Настройки приходят из content.py (см. GAME_DURATION, GAME_WIN_HEADLINE и т.д.).
     const gameConfig = Object.assign({
