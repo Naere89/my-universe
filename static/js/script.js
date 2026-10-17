@@ -75,28 +75,6 @@
         envelopeButton.setAttribute("aria-expanded", "false");
     });
 
-    // -------------------- Призраки с посланиями --------------------
-    const popup = document.getElementById("memoryPopup");
-    const popupTitle = document.getElementById("memoryTitle");
-    const popupMessage = document.getElementById("memoryMessage");
-    const closeMemory = () => popup.classList.add("hidden");
-
-    document.querySelectorAll(".memory-star").forEach((button) => {
-        button.addEventListener("click", () => {
-            popupTitle.textContent = button.dataset.title || "Особый призрак";
-            popupMessage.textContent = button.dataset.message || "Небольшое послание для тебя.";
-            popup.classList.remove("hidden");
-            playTone(740, 0.08);
-            document.getElementById("closeMemory").focus();
-        });
-    });
-
-    document.getElementById("closeMemory").addEventListener("click", closeMemory);
-    document.getElementById("memoryOkay").addEventListener("click", closeMemory);
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") closeMemory();
-    });
-
     // -------------------- Звуковые сигналы без файлов --------------------
     let soundEnabled = false;
     let audioContext = null;
