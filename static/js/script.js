@@ -135,44 +135,31 @@
         if (soundEnabled) playTone(880, 0.12);
     });
 
-    // -------------------- Тайная тыква-сундук --------------------
-    const chestPumpkin = document.getElementById("chestPumpkin");
-    const chestLid = document.getElementById("chestLid");
-    const chestMessage = document.getElementById("chestMessage");
-    const chestClose = document.getElementById("chestClose");
-    const chestTitle = document.getElementById("chestTitle");
-    const chestText = document.getElementById("chestText");
+    // -------------------- 4 тыквочки с посланиями --------------------
+    const pumpkins = document.querySelectorAll(".small-pumpkin");
+    const pumpkinPopup = document.getElementById("pumpkinPopup");
+    const pumpkinTitle = document.getElementById("pumpkinTitle");
+    const pumpkinText = document.getElementById("pumpkinText");
+    const pumpkinClose = document.getElementById("pumpkinClose");
+    const pumpkinOkay = document.getElementById("pumpkinOkay");
 
-    let chestIndex = 0;
-    const chestMessages = window.CHEST_MESSAGES || [];
-
-    function openChest() {
-        if (!chestPumpkin || chestMessage.classList.contains("visible")) return;
-        chestLid.classList.add("opened");
-        chestPumpkin.style.pointerEvents = "none";
-        setTimeout(() => {
-            chestTitle.textContent = "Послание из бездны";
-            chestText.textContent = chestMessages[chestIndex] || "Тайна осталась в тыкве.";
-            chestIndex = (chestIndex + 1) % chestMessages.length;
-            chestMessage.classList.remove("hidden");
-            requestAnimationFrame(() => chestMessage.classList.add("visible"));
+    pumpkins.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            pumpkinTitle.textContent = "Послание из бездны";
+            pumpkinText.textContent = btn.dataset.message || "Тайна осталась в тыкве.";
+            pumpkinPopup.classList.remove("hidden");
             playTone(740, 0.1);
-        }, 450);
-    }
+        });
+    });
 
-    function closeChest() {
-        if (!chestMessage) return;
-        chestMessage.classList.remove("visible");
-        chestLid.classList.remove("opened");
-        if (chestPumpkin) chestPumpkin.style.pointerEvents = "auto";
-        setTimeout(() => chestMessage.classList.add("hidden"), 350);
+    function closePumpkinPopup() {
+        pumpkinPopup.classList.add("hidden");
     }
-
-    if (chestPumpkin) {
-        chestPumpkin.addEventListener("click", openChest);
-        chestPumpkin.addEventListener("keydown", (e) => { if (e.key === "Enter") openChest(); });
-    }
-    if (chestClose) chestClose.addEventListener("click", closeChest);
+    pumpkinClose.addEventListener("click", closePumpkinPopup);
+    pumpkinOkay.addEventListener("click", closePumpkinPopup);
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closePumpkinPopup();
+    });
 
     // -------------------- Мини-игра «Охота за приведениями и мышками» --------------------
     // Настройки приходят из content.py (см. GAME_DURATION, GAME_WIN_HEADLINE и т.д.).

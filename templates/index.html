@@ -71,17 +71,21 @@
                 <p>{{ c.CHEST_SUB }}</p>
             </div>
 
-            <div class="chest-map" id="chestMap">
-                <div class="chest-pumpkin" id="chestPumpkin" type="button" role="button" tabindex="0" aria-label="Открыть сундук-тыкву">
-                    <div class="chest-lid" id="chestLid">🎃</div>
-                    <div class="chest-body">🎃</div>
-                </div>
-                <div class="chest-message hidden" id="chestMessage">
-                    <button class="popup-close" id="chestClose" type="button" aria-label="Закрыть">×</button>
-                    <p class="eyebrow">{{ c.POPUP_EYEBROW }}</p>
-                    <h3 id="chestTitle"></h3>
-                    <p id="chestText"></p>
-                </div>
+            <div class="pumpkins-row">
+                {% for i in range(4) %}
+                <button class="small-pumpkin" type="button" data-message="{{ c.CHEST_MESSAGES[i] }}" aria-label="Открыть тыкву {{ loop.index }}">
+                    🎃<span class="pumpkin-label">Тыква {{ loop.index }}</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="pumpkin-popup hidden" id="pumpkinPopup" role="dialog" aria-modal="true" aria-labelledby="pumpkinTitle">
+                <button class="popup-close" id="pumpkinClose" type="button" aria-label="Закрыть">×</button>
+                <div class="popup-pumpkin">🎃</div>
+                <p class="eyebrow">{{ c.POPUP_EYEBROW }}</p>
+                <h3 id="pumpkinTitle"></h3>
+                <p id="pumpkinText"></p>
+                <button class="secondary-button" id="pumpkinOkay" type="button">{{ c.CHEST_CLOSE }}</button>
             </div>
             <p class="tiny-note">{{ c.CHEST_HINT }}</p>
         </section>
