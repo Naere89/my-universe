@@ -123,7 +123,7 @@
 
     pumpkins.forEach((btn) => {
         btn.addEventListener("click", () => {
-            pumpkinTitle.textContent = "Послание из бездны";
+            pumpkinTitle.textContent = "Комплемент от вашего вестника";
             pumpkinText.textContent = btn.dataset.message || "Тайна осталась в тыкве.";
             pumpkinPopup.classList.remove("hidden");
             playTone(740, 0.1);
