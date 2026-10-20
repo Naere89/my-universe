@@ -73,7 +73,7 @@
 
             <div class="pumpkins-row">
                 {% for i in range(4) %}
-                <button class="small-pumpkin" type="button" data-message="{{ c.CHEST_MESSAGES[i] }}" aria-label="Открыть тыкву {{ loop.index }}">
+                <button class="small-pumpkin" type="button" data-title="{{ c.CHEST_TITLES[i] }}" data-message="{{ c.CHEST_MESSAGES[i] }}" aria-label="Открыть тыкву {{ loop.index }}">
                     🎃<span class="pumpkin-label">Послание ночи {{ loop.index }}</span>
                 </button>
                 {% endfor %}
@@ -141,6 +141,7 @@
 
     <script>window.GAME_CONFIG = {{ game_config | tojson }};</script>
     <script>window.CHEST_MESSAGES = {{ c.CHEST_MESSAGES | tojson }};</script>
+    <script>window.CHEST_TITLES = {{ c.CHEST_TITLES | tojson }};</script>
     <script src="{{ url_for('static', filename='js/script.js', v=av) }}"></script>
 </body>
 </html>
